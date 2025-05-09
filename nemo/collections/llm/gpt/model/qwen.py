@@ -45,6 +45,7 @@ class QwenConfig(GPTConfig):
     layernorm_epsilon: float = 1e-6
     attention_dropout: float = 0.0
     init_method_std: int = 0.02
+    tie_word_embeddings: bool = False
 
 @dataclass
 class Qwen2Config(QwenConfig):
@@ -77,7 +78,7 @@ class Qwen2Config500M(Qwen2Config):
     """
     Config for Qwen 2 0.5B: https://huggingface.co/Qwen/Qwen2-0.5B
     """
-
+    tie_word_embeddings: bool = True
     num_layers: int = 24
     hidden_size: int = 896
     num_attention_heads: int = 14
@@ -98,6 +99,7 @@ class Qwen3Config600M(Qwen3Config):
     """
     Config for Qwen 3 0.6B: https://huggingface.co/Qwen/Qwen3-0.6B
     """
+    tie_word_embeddings: bool = True
     num_layers: int = 28
     hidden_size: int = 1024
     num_attention_heads: int = 16
@@ -108,7 +110,7 @@ class Qwen2Config1P5B(Qwen2Config):
     """
     Config for Qwen 2 1.5B: https://huggingface.co/Qwen/Qwen2-1.5B
     """
-
+    tie_word_embeddings: bool = True
     num_layers: int = 28
     hidden_size: int = 1536
     num_attention_heads: int = 12
@@ -130,6 +132,7 @@ class Qwen3Config1P7B(Qwen3Config):
     """
     Config for Qwen 3 1.7B: https://huggingface.co/Qwen/Qwen3-1.7B
     """
+    tie_word_embeddings: bool = True
     num_layers: int = 28
     hidden_size: int = 2048
     num_attention_heads: int = 16
@@ -141,6 +144,7 @@ class Qwen3Config4B(Qwen3Config):
     """
     Config for Qwen 3 4B: https://huggingface.co/Qwen/Qwen3-4B
     """
+    tie_word_embeddings: bool = True
     num_layers: int = 36
     hidden_size: int = 2560
     num_attention_heads: int = 32
@@ -175,7 +179,7 @@ class Qwen3Config8B(Qwen3Config):
     """
     Config for Qwen 3 8B: https://huggingface.co/Qwen/Qwen3-8B
     """
-    # TODO tie-word-embedding false
+
     num_layers: int = 36
     hidden_size: int = 4096
     num_attention_heads: int = 32
@@ -203,7 +207,7 @@ class Qwen3Config14B(Qwen3Config):
     """
     Config for Qwen 3 14B: https://huggingface.co/Qwen/Qwen3-14B
     """
-    # TODO tie-word-embedding false
+
     num_layers: int = 40
     hidden_size: int = 5120
     num_attention_heads: int = 40
@@ -231,7 +235,7 @@ class Qwen3Config32B(Qwen3Config):
     """
     Config for Qwen 3 32B: https://huggingface.co/Qwen/Qwen3-32B
     """
-    # TODO tie-word-embedding false
+
     num_layers: int = 64
     hidden_size: int = 5120
     num_attention_heads: int = 64
@@ -309,6 +313,9 @@ class HFQwen2Importer(io.ModelConnector["AutoModelForCausalLM", Qwen2Model]):
             "model.norm.weight": "decoder.final_layernorm.weight",
             "lm_head.weight": "output_layer.weight",
         }
+        if getattr(source.config, "tie_word_embeddings", False):
+            # qwen models under 7B have no shared input output embeddings
+            del mapping["lm_head.weight"]
 
         transforms = [
             io.state_transform(
@@ -474,7 +481,7 @@ class HFQwen2Exporter(io.ModelConnector[Qwen2Model, "AutoModelForCausalLM"]):
             rope_theta=source.rotary_base,
             vocab_size=getattr(source, 'vocab_size', self.tokenizer.vocab_size),
             sliding_window=source.seq_length,
-            tie_word_embeddings=False,
+            tie_word_embeddings=source.tie_word_embeddings,
         )
 
 
