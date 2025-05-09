@@ -307,7 +307,6 @@ class HFQwenImporter(io.ModelConnector["AutoModelForCausalLM", Qwen2Model]):
         mapping = {
             "model.embed_tokens.weight": "embedding.word_embeddings.weight",
             "model.layers.*.self_attn.o_proj.weight": "decoder.layers.*.self_attention.linear_proj.weight",
-            "model.layers.*.mlp.down_proj.weight": "decoder.layers.*.mlp.linear_fc2.weight",
             "model.layers.*.input_layernorm.weight": "decoder.layers.*.self_attention.linear_qkv.layer_norm_weight",
             "model.layers.*.post_attention_layernorm.weight": "decoder.layers.*.mlp.linear_fc1.layer_norm_weight",
             "model.norm.weight": "decoder.final_layernorm.weight",
@@ -364,32 +363,23 @@ class HFQwenImporter(io.ModelConnector["AutoModelForCausalLM", Qwen2Model]):
         #         ]
         #     )
         
+        # TODO
         if 'moe' in getattr(source.config, "model_type"):
-            transforms.extend(
-                [
-                    io.state_transform(
-                        source_key=(
-                            # "model.layers.*.self_attn.q_proj.bias",
-                            # "model.layers.*.self_attn.k_proj.bias",
-                            # "model.layers.*.self_attn.v_proj.bias",
-                        ),
-                        # target_key="decoder.layers.*.self_attention.linear_qkv.bias",
-                        fn=TransformFns.merge_qkv_bias,
-                    ),
-                ]
-            )
+            pass
+        
         else:
             # Dense Mapping
+            dense_mapping = {
+                "model.layers.*.mlp.down_proj.weight": "decoder.layers.*.mlp.linear_fc2.weight",
+            }
+            mapping.update(dense_mapping)
+            
             transforms.extend(
                 [
                     io.state_transform(
-                        source_key=(
-                            # "model.layers.*.self_attn.q_proj.bias",
-                            # "model.layers.*.self_attn.k_proj.bias",
-                            # "model.layers.*.self_attn.v_proj.bias",
-                        ),
-                        # target_key="decoder.layers.*.self_attention.linear_qkv.bias",
-                        fn=TransformFns.merge_qkv_bias,
+                        source_key=("model.layers.*.mlp.gate_proj.weight", "model.layers.*.mlp.up_proj.weight"),
+                        target_key="decoder.layers.*.mlp.linear_fc1.weight",
+                        fn=TransformFns.merge_fc1,
                     ),
                 ]
             )
