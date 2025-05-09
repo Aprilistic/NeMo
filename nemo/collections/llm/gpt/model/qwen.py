@@ -33,27 +33,43 @@ if TYPE_CHECKING:
     from nemo.collections.common.tokenizers.huggingface.auto_tokenizer import AutoTokenizer
     from nemo.collections.common.tokenizers.tokenizer_spec import TokenizerSpec
 
+@dataclass
+class QwenConfig(GPTConfig):
+    """
+    Base config for Qwen Models
+    """
+    activation_func: Callable = F.silu
+    vocab_size: int = 151936
+    rotary_base: float = 1000000.0
+    position_embedding_type: str = "rope"
+    layernorm_epsilon: float = 1e-6
+    attention_dropout: float = 0.0
+    init_method_std: int = 0.02
 
 @dataclass
-class Qwen2Config(GPTConfig):
+class Qwen2Config(QwenConfig):
     """
     Base config for Qwen 2 Models
     """
-
+    #TODO Not sure what these parameters are for..
     normalization: str = "RMSNorm"
-    activation_func: Callable = F.silu
     gated_linear_unit: bool = True
     add_bias_linear: bool = False
     add_qkv_bias: bool = True
     seq_length: int = 4096
-    init_method_std: int = 0.02
     hidden_dropout: float = 0.0
-    attention_dropout: float = 0.0
-    vocab_size: int = 151936
     share_embeddings_and_output_weights: Optional[bool] = False
-    layernorm_epsilon: float = 1e-6
-    rotary_base: float = 1000000.0
-    position_embedding_type: str = "rope"
+
+@dataclass
+class Qwen3Config(QwenConfig):
+    """
+    Base config for Qwen 3 Models
+    """
+    num_query_groups: int = 8
+    # TODO
+    # "attention_bias": false,
+    # "head_dim": 128,
+    # "rope_scaling": null,
 
 
 @dataclass
@@ -77,6 +93,15 @@ class Qwen25Config500M(Qwen2Config500M):
 
     seq_length: int = 32768
 
+@dataclass
+class Qwen3Config600M(Qwen3Config):
+    """
+    Config for Qwen 3 0.6B: https://huggingface.co/Qwen/Qwen3-0.6B
+    """
+    num_layers: int = 28
+    hidden_size: int = 1024
+    num_attention_heads: int = 16
+    ffn_hidden_size: int = 3072
 
 @dataclass
 class Qwen2Config1P5B(Qwen2Config):
@@ -98,6 +123,28 @@ class Qwen25Config1P5B(Qwen2Config1P5B):
     """
 
     seq_length: int = 131072
+
+
+@dataclass
+class Qwen3Config1P7B(Qwen3Config):
+    """
+    Config for Qwen 3 1.7B: https://huggingface.co/Qwen/Qwen3-1.7B
+    """
+    num_layers: int = 28
+    hidden_size: int = 2048
+    num_attention_heads: int = 16
+    ffn_hidden_size: int = 6144
+
+
+@dataclass
+class Qwen3Config4B(Qwen3Config):
+    """
+    Config for Qwen 3 4B: https://huggingface.co/Qwen/Qwen3-4B
+    """
+    num_layers: int = 36
+    hidden_size: int = 2560
+    num_attention_heads: int = 32
+    ffn_hidden_size: int = 9728
 
 
 @dataclass
@@ -124,6 +171,18 @@ class Qwen25Config7B(Qwen2Config7B):
 
 
 @dataclass
+class Qwen3Config8B(Qwen3Config):
+    """
+    Config for Qwen 3 8B: https://huggingface.co/Qwen/Qwen3-8B
+    """
+    # TODO tie-word-embedding false
+    num_layers: int = 36
+    hidden_size: int = 4096
+    num_attention_heads: int = 32
+    ffn_hidden_size: int = 12288
+
+
+@dataclass
 class Qwen25Config14B(Qwen2Config):
     """
     Config for Qwen 2.5 14B: https://huggingface.co/Qwen/Qwen2.5-14B
@@ -140,6 +199,18 @@ class Qwen25Config14B(Qwen2Config):
 
 
 @dataclass
+class Qwen3Config14B(Qwen3Config):
+    """
+    Config for Qwen 3 14B: https://huggingface.co/Qwen/Qwen3-14B
+    """
+    # TODO tie-word-embedding false
+    num_layers: int = 40
+    hidden_size: int = 5120
+    num_attention_heads: int = 40
+    ffn_hidden_size: int = 17408
+
+
+@dataclass
 class Qwen25Config32B(Qwen2Config):
     """
     Config for Qwen 2.5 32B: https://huggingface.co/Qwen/Qwen2.5-32B
@@ -153,6 +224,18 @@ class Qwen25Config32B(Qwen2Config):
     vocab_size: int = 152064
     layernorm_epsilon: float = 1e-5
     seq_length: int = 131072
+
+
+@dataclass
+class Qwen3Config32B(Qwen3Config):
+    """
+    Config for Qwen 3 32B: https://huggingface.co/Qwen/Qwen3-32B
+    """
+    # TODO tie-word-embedding false
+    num_layers: int = 64
+    hidden_size: int = 5120
+    num_attention_heads: int = 64
+    ffn_hidden_size: int = 25600
 
 
 @dataclass
