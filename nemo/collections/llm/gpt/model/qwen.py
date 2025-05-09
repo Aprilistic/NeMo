@@ -282,7 +282,7 @@ class Qwen2Model(GPTModel):
 
 
 @io.model_importer(Qwen2Model, "hf")
-class HFQwen2Importer(io.ModelConnector["AutoModelForCausalLM", Qwen2Model]):
+class HFQwenImporter(io.ModelConnector["AutoModelForCausalLM", Qwen2Model]):
     # pylint: disable=C0115,C0116
     def init(self) -> Qwen2Model:
         return Qwen2Model(self.config, tokenizer=self.tokenizer)
@@ -328,20 +328,72 @@ class HFQwen2Importer(io.ModelConnector["AutoModelForCausalLM", Qwen2Model]):
                 fn=TransformFns.merge_qkv,
             ),
             io.state_transform(
-                source_key=(
-                    "model.layers.*.self_attn.q_proj.bias",
-                    "model.layers.*.self_attn.k_proj.bias",
-                    "model.layers.*.self_attn.v_proj.bias",
-                ),
-                target_key="decoder.layers.*.self_attention.linear_qkv.bias",
-                fn=TransformFns.merge_qkv_bias,
-            ),
-            io.state_transform(
                 source_key=("model.layers.*.mlp.gate_proj.weight", "model.layers.*.mlp.up_proj.weight"),
                 target_key="decoder.layers.*.mlp.linear_fc1.weight",
                 fn=TransformFns.merge_fc1,
             ),
         ]
+        
+        if 'qwen2' in getattr(source.config, "model_type"):
+            transforms.extend(
+                [
+                    io.state_transform(
+                        source_key=(
+                            "model.layers.*.self_attn.q_proj.bias",
+                            "model.layers.*.self_attn.k_proj.bias",
+                            "model.layers.*.self_attn.v_proj.bias",
+                        ),
+                        target_key="decoder.layers.*.self_attention.linear_qkv.bias",
+                        fn=TransformFns.merge_qkv_bias,
+                    ),
+                ]
+            )
+        
+        # if 'qwen3' in getattr(source.config, "model_type"): # add this for RMSNorm for query and key if needed
+        #     transforms.extend(
+        #         [
+        #             io.state_transform(
+        #                 source_key=(
+        #                     "model.layers.*.self_attn.q_norm.weight",
+        #                     "model.layers.*.self_attn.k_norm.weight",
+        #                 ),
+        #                 target_key="decoder.layers.*.mlp.linear_fc1.layer_norm_weight", ✅ need to check the corresponding key
+        #                 target_key="decoder.layers.*.self_attention.linear_qkv.bias", 
+        #                 fn=TransformFns.merge_qkv_bias,
+        #             ),
+        #         ]
+        #     )
+        
+        if 'moe' in getattr(source.config, "model_type"):
+            transforms.extend(
+                [
+                    io.state_transform(
+                        source_key=(
+                            # "model.layers.*.self_attn.q_proj.bias",
+                            # "model.layers.*.self_attn.k_proj.bias",
+                            # "model.layers.*.self_attn.v_proj.bias",
+                        ),
+                        # target_key="decoder.layers.*.self_attention.linear_qkv.bias",
+                        fn=TransformFns.merge_qkv_bias,
+                    ),
+                ]
+            )
+        else:
+            # Dense Mapping
+            transforms.extend(
+                [
+                    io.state_transform(
+                        source_key=(
+                            # "model.layers.*.self_attn.q_proj.bias",
+                            # "model.layers.*.self_attn.k_proj.bias",
+                            # "model.layers.*.self_attn.v_proj.bias",
+                        ),
+                        # target_key="decoder.layers.*.self_attention.linear_qkv.bias",
+                        fn=TransformFns.merge_qkv_bias,
+                    ),
+                ]
+            )
+        
         return io.apply_transforms(source, target, mapping=mapping, transforms=transforms)
 
     @property
