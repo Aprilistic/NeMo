@@ -20,7 +20,7 @@ import torch
 from lightning.pytorch.callbacks.callback import Callback
 
 from nemo import lightning as nl
-from nemo.collections.llm.gpt.model.qwen2 import (
+from nemo.collections.llm.gpt.model.qwen import (
     Qwen2Config1P5B,
     Qwen2Config7B,
     Qwen2Config72B,
