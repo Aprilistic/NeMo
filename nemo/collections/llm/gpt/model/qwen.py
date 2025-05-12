@@ -523,6 +523,7 @@ class HFQwen2Exporter(io.ModelConnector[Qwen2Model, "AutoModelForCausalLM"]):
 
 __all__ = [
     "Qwen2Config",
+    "Qwen3Config",
     "Qwen2Config500M",
     "Qwen2Config1P5B",
     "Qwen2Config7B",
@@ -533,5 +534,11 @@ __all__ = [
     "Qwen25Config14B",
     "Qwen25Config32B",
     "Qwen25Config72B",
+    "Qwen3Config600M",
+    "Qwen3Config1P7B",
+    "Qwen3Config4B",
+    "Qwen3Config8B",
+    "Qwen3Config14B",
+    "Qwen3Config32B",
     "Qwen2Model",
 ]
