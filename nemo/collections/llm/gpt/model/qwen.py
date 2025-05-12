@@ -348,20 +348,14 @@ class HFQwenImporter(io.ModelConnector["AutoModelForCausalLM", Qwen2Model]):
                 ]
             )
         
-        # if 'qwen3' in getattr(source.config, "model_type"): # add this for RMSNorm for query and key if needed
-        #     transforms.extend(
-        #         [
-        #             io.state_transform(
-        #                 source_key=(
-        #                     "model.layers.*.self_attn.q_norm.weight",
-        #                     "model.layers.*.self_attn.k_norm.weight",
-        #                 ),
-        #                 target_key="decoder.layers.*.mlp.linear_fc1.layer_norm_weight", ✅ need to check the corresponding key
-        #                 target_key="decoder.layers.*.self_attention.linear_qkv.bias", 
-        #                 fn=TransformFns.merge_qkv_bias,
-        #             ),
-        #         ]
-        #     )
+        if 'qwen3' in getattr(source.config, "model_type"):
+            qwen3_mapping = {
+                "model.layers.*.self_attn.q_norm.weight": "decoder.layers.*.self_attention.q_layernorm.weight",
+                "model.layers.*.self_attn.k_norm.weight": "decoder.layers.*.self_attention.k_layernorm.weight", 
+            }
+
+            # Update the main mapping dictionary with Qwen3-specific mappings
+            mapping.update(qwen3_mapping)
         
         # TODO
         if 'moe' in getattr(source.config, "model_type"):
