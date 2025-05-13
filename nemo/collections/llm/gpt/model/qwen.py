@@ -266,26 +266,26 @@ class Qwen25Config72B(Qwen2Config72B):
     seq_length: int = 131072
 
 
-class Qwen2Model(GPTModel):
+class QwenModel(GPTModel):
     """
-    Base model for Qwen 2
+    Base model for Qwen
     """
 
     def __init__(
         self,
-        config: Annotated[Optional[Qwen2Config], Config[Qwen2Config]] = None,
+        config: Annotated[Optional[QwenConfig], Config[QwenConfig]] = None,
         optim: Optional[OptimizerModule] = None,
         tokenizer: Optional["TokenizerSpec"] = None,
         model_transform: Optional[Callable[[nn.Module], nn.Module]] = None,
     ):
-        super().__init__(config or Qwen2Config(), optim=optim, tokenizer=tokenizer, model_transform=model_transform)
+        super().__init__(config or QwenConfig(), optim=optim, tokenizer=tokenizer, model_transform=model_transform)
 
 
-@io.model_importer(Qwen2Model, "hf")
-class HFQwenImporter(io.ModelConnector["AutoModelForCausalLM", Qwen2Model]):
+@io.model_importer(QwenModel, "hf")
+class HFQwenImporter(io.ModelConnector["AutoModelForCausalLM", QwenModel]):
     # pylint: disable=C0115,C0116
-    def init(self) -> Qwen2Model:
-        return Qwen2Model(self.config, tokenizer=self.tokenizer)
+    def init(self) -> QwenModel:
+        return QwenModel(self.config, tokenizer=self.tokenizer)
 
     def apply(self, output_path: Path) -> Path:
         from transformers import AutoModelForCausalLM
@@ -417,8 +417,8 @@ class HFQwenImporter(io.ModelConnector["AutoModelForCausalLM", Qwen2Model]):
         return output
 
 
-@io.model_exporter(Qwen2Model, "hf")
-class HFQwen2Exporter(io.ModelConnector[Qwen2Model, "AutoModelForCausalLM"]):
+@io.model_exporter(QwenModel, "hf")
+class HFQwen2Exporter(io.ModelConnector[QwenModel, "AutoModelForCausalLM"]):
     # pylint: disable=C0115,C0116
     def init(self, dtype=torch.bfloat16) -> "AutoModelForCausalLM":
         from transformers import AutoModelForCausalLM
@@ -540,5 +540,5 @@ __all__ = [
     "Qwen3Config8B",
     "Qwen3Config14B",
     "Qwen3Config32B",
-    "Qwen2Model",
+    "QwenModel",
 ]
