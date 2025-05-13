@@ -388,7 +388,7 @@ def get_model_type(nemo_ckpt: Union[str, Path]) -> Optional[str]:
             "nemo.collections.llm.gpt.model.phi3mini.Phi3Model": "phi3",
             "nemo.collections.llm.gpt.model.baichuan.Baichuan2Model": "baichuan",
             "nemo.collections.llm.gpt.model.chatglm.ChatGLMModel": "chatglm",
-            "nemo.collections.llm.gpt.model.qwen2.QwenModel": "qwen",
+            "nemo.collections.llm.gpt.model.qwen.QwenModel": "qwen",
         }
         try:
             model_type = NEMO2_TO_MODEL_TYPE[model_class]
