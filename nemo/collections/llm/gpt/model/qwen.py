@@ -38,6 +38,7 @@ class QwenConfig(GPTConfig):
     """
     Base config for Qwen Models
     """
+    normalization: str = "RMSNorm"
     activation_func: Callable = F.silu
     vocab_size: int = 151936
     rotary_base: float = 1000000.0
@@ -53,7 +54,6 @@ class Qwen2Config(QwenConfig):
     Base config for Qwen 2 Models
     """
     #TODO Not sure what these parameters are for..
-    normalization: str = "RMSNorm"
     gated_linear_unit: bool = True
     add_bias_linear: bool = False
     add_qkv_bias: bool = True
