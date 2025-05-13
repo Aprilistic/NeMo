@@ -25,13 +25,13 @@ from nemo.collections.llm.gpt.model.qwen import (
     Qwen2Config7B,
     Qwen2Config72B,
     Qwen2Config500M,
-    Qwen2Model,
     Qwen25Config1P5B,
     Qwen25Config7B,
     Qwen25Config14B,
     Qwen25Config32B,
     Qwen25Config72B,
     Qwen25Config500M,
+    QwenModel,
 )
 from nemo.collections.llm.recipes.precision.mixed_precision import bf16_mixed, fp16_mixed
 
@@ -70,7 +70,7 @@ def qwen2_model(version: str) -> run.Config[pl.LightningModule]:
         config = run.Config(Qwen25Config72B)
 
     assert config is not None, f"Invalid version: {version}"
-    return run.Config(Qwen2Model, config=config)
+    return run.Config(QwenModel, config=config)
 
 
 def qwen2_trainer(
