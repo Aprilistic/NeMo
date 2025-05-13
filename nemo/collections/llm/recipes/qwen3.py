@@ -64,7 +64,7 @@ def qwen3_model(version: str) -> run.Config[pl.LightningModule]:
         raise NotImplementedError("MOE support is not implemented yet.")
 
     assert config is not None, f"Invalid version: {version}"
-    return run.Config(Qwen3Model, config=config)
+    return run.Config(QwenModel, config=config)
 
 
 def qwen3_trainer(
