@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 HF_ORI_PATH=/home/TestData/llm/models/qwen2_toy
-NEMO_MODEL_TYPE=Qwen2Model
+NEMO_MODEL_TYPE=QwenModel
 NEMO_MODEL_CONFIG=Qwen2Config500M
 NEMO_OUTPUT_PATH=/tmp/output_nemo2_ckpt
 HF_OUTPUT_PATH=/tmp/output_hf_ckpt

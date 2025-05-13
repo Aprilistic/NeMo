@@ -548,7 +548,7 @@ gpt_model_type = [
     (llm.MistralModel, "llama"),
     (llm.MixtralModel, "llama"),
     (llm.NemotronModel, "gpt"),
-    (llm.Qwen2Model, "qwen"),
+    (llm.QwenModel, "qwen"),
     (llm.StarcoderModel, "gpt"),
     (llm.Starcoder2Model, "gpt"),
     (llm.Phi3Model, "phi3"),
