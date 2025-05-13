@@ -27,7 +27,7 @@ from nemo.collections.llm.gpt.model.qwen import (
     Qwen3Config8B,
     Qwen3Config14B,
     Qwen3Config32B,
-    Qwen3Model, # TODO
+    Qwen3Model,
 )
 from nemo.collections.llm.recipes.precision.mixed_precision import bf16_mixed, fp16_mixed
 
@@ -37,8 +37,8 @@ def qwen3_model(version: str) -> run.Config[pl.LightningModule]:
     A function to create a qwen3 models.
 
     Args:
-        version (str): The version of the qwen2 model to create. one of ["qwen3_600m", "qwen3_1p7b",
-            "qwen3_4b", "qwen3_8b", "qwen3_14b", "qwen3_32b"].
+        version (str): The version of the qwen3 model to create. one of ["qwen3_600m", "qwen3_1p7b",
+            "qwen3_4b", "qwen3_8b", "qwen3_14b", "qwen3_32b", "qwen3_30b_a3b", "qwen3_235b_a22b"].
 
     Returns:
         run.Config[pl.LightningModule]: Configuration for the qwen3 model.
@@ -56,6 +56,12 @@ def qwen3_model(version: str) -> run.Config[pl.LightningModule]:
         config = run.Config(Qwen3Config14B)
     elif version == "qwen3_32b":
         config = run.Config(Qwen3Config32B)
+    elif version == "qwen3_30b_a3b":
+        # TODO: Add MOE support
+        raise NotImplementedError("MOE support is not implemented yet.")
+    elif version == "qwen3_235b_a22b":
+        # TODO: Add MOE support
+        raise NotImplementedError("MOE support is not implemented yet.")
 
     assert config is not None, f"Invalid version: {version}"
     return run.Config(Qwen3Model, config=config)
